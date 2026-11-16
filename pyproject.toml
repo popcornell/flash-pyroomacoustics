@@ -1,0 +1,21 @@
+[build-system]
+requires = ["maturin>=1.7,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "pyroomacoustics"
+version = "0.10.2.dev7+rust"
+description = "pyroomacoustics with its C++ core re-implemented in Rust (bit-identical results), plus optional GPU acceleration."
+readme = "README.rst"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+dependencies = ["numpy>=1.13.0", "scipy>=0.18.0"]
+
+[project.optional-dependencies]
+cuda = ["torch"]
+
+[tool.maturin]
+python-source = "python"
+module-name = "pyroomacoustics.libroom"
+features = ["pyo3/extension-module"]
+include = [{ path = "python/pyroomacoustics/data/*.json", format = "wheel" }]

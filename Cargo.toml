@@ -1,0 +1,19 @@
+[package]
+name = "libroom"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+numpy = "0.30.0"
+pyo3 = { version = "0.30" }
+rayon = "1.12.0"
+
+[lib]
+name = "libroom"
+crate-type = ["cdylib"]
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+debug = false
