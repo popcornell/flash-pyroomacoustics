@@ -1016,9 +1016,9 @@ fn set_rng_seed(seed: u64) {
     rng::set_seed(seed);
 }
 
-/// Opt-in non-exact mode: use one random generator per ray so that ray tracing
-/// with scattering runs in parallel. Results are statistically equivalent to
-/// the original but no longer bit-identical. Default: False.
+/// Use one random generator per ray so that ray tracing with scattering runs in
+/// parallel. Results are statistically equivalent to the original but not
+/// bit-identical. Default: True; `constants.set("exact_mode", True)` turns it off.
 #[pyfunction]
 fn set_parallel_rng(state: bool) {
     tracer::PARALLEL_RNG.store(state, std::sync::atomic::Ordering::Relaxed);
