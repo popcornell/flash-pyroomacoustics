@@ -135,6 +135,20 @@ Notes:
 * On a shared machine, keep `PRA_NUM_THREADS` small. Select the GPU with
   `PRA_CUDA_DEVICE=cuda:N` or `CUDA_VISIBLE_DEVICES`.
 
+## Listening page
+
+`examples/listening_page/build.py` builds a self-contained HTML page for inspecting
+the RIRs (dB and linear views, energy decay curve, floor plan, T20/EDT/C50/DRR) and
+listening to reverberant speech next to its direct-path and 50 ms early targets. It
+covers six rooms, each with a near and a far mic.
+
+```bash
+python examples/listening_page/build.py speech_16k.wav rir_listening_room.html
+```
+
+The input must be a 16 kHz mono WAV file, e.g. a CMU ARCTIC sample from the upstream
+repository. All the audio is embedded in the page, about 9 MB for a 4 s utterance.
+
 ## Reproducibility
 
 `pra.random.seed(numpy=..., libroom=...)` seeds both NumPy and the compiled engine:

@@ -1,0 +1,428 @@
+<title>RIR Listening Room</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: an instrument panel. Room rail on top, then plan + numbers beside the RIR scope, then three listening strips. */
+:root {
+  --bg: #f3f5f7;
+  --panel: #ffffff;
+  --ink: #18212b;
+  --muted: #5d6b79;
+  --line: #d9dfe6;
+  --rev: #d0571b;      /* reverberant: warm */
+  --early: #6a4fc2;    /* early target: violet */
+  --direct: #11847a;   /* direct path: teal */
+  --edc: #18212b;
+  --focus: #2f6fd6;
+  --font-display: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161c; --panel: #19212a; --ink: #e6ebf0; --muted: #94a3b2; --line: #2b3641;
+    --rev: #f08a4b; --early: #a48cf0; --direct: #3cc4b4; --edc: #e6ebf0; --focus: #7aa7ff;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161c; --panel: #19212a; --ink: #e6ebf0; --muted: #94a3b2; --line: #2b3641;
+  --rev: #f08a4b; --early: #a48cf0; --direct: #3cc4b4; --edc: #e6ebf0; --focus: #7aa7ff;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 48px;
+}
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 22px; }
+header { display: grid; gap: 6px; }
+h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(26px, 4vw, 36px); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); margin: 0; max-width: 70ch; }
+.lede code, .note code { font-family: var(--font-data); font-size: 0.9em; }
+h2 { font-family: var(--font-display); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0; }
+
+/* room rail */
+.rail { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; }
+.room-btn {
+  text-align: left; border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+  border-radius: 8px; padding: 10px 12px; cursor: pointer; font: inherit; display: grid; gap: 2px;
+}
+.room-btn:hover { border-color: var(--muted); }
+.room-btn[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.room-btn .nm { font-weight: 600; }
+.room-btn .sub { font-family: var(--font-data); font-size: 12px; color: var(--muted); }
+button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel); }
+.seg button { font: inherit; font-size: 13px; border: 0; background: transparent; color: var(--muted); padding: 6px 12px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+.grid { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+
+.plan svg { width: 100%; height: auto; display: block; }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 16px; margin: 0; }
+.stats div { display: grid; gap: 0; }
+.stats dt { font-size: 12px; color: var(--muted); }
+.stats dd { margin: 0; font-family: var(--font-data); font-size: 17px; font-variant-numeric: tabular-nums; }
+.stats dd small { font-size: 12px; color: var(--muted); }
+
+.scope canvas { width: 100%; height: 300px; display: block; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+
+.listen { display: grid; gap: 10px; }
+.strip { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 14px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+@media (max-width: 700px) { .strip { grid-template-columns: minmax(0, 1fr); } }
+.strip .who { display: flex; gap: 12px; align-items: center; }
+.play {
+  width: 42px; height: 42px; border-radius: 50%; border: 0; cursor: pointer; flex: none;
+  display: grid; place-items: center; color: #fff;
+}
+.play svg { width: 16px; height: 16px; fill: currentColor; }
+.who .t { font-weight: 600; }
+.who .d { font-size: 13px; color: var(--muted); line-height: 1.35; }
+.spec { position: relative; min-width: 0; }
+.spec canvas { width: 100%; height: 96px; display: block; border-radius: 6px; cursor: pointer; }
+.note { color: var(--muted); font-size: 13px; max-width: 80ch; margin: 0; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>RIR Listening Room</h1>
+    <p class="lede">Six rooms simulated with fast-pyroomacoustics (hybrid ISM order 3 + ray tracing, scattering 0.15, air absorption; one room as full-order ISM for comparison). Pick a room and a microphone, inspect the impulse response, then listen to the reverberant speech next to its aligned training targets.</p>
+  </header>
+
+  <section class="rail" id="rail" aria-label="Rooms"></section>
+
+  <div class="grid">
+    <div class="panel plan">
+      <div class="row">
+        <h2>Floor plan</h2>
+        <div class="seg" id="micSeg" role="group" aria-label="Microphone">
+          <button id="mic-near" data-mic="0" aria-pressed="true">Near mic</button>
+          <button id="mic-far" data-mic="1" aria-pressed="false">Far mic</button>
+        </div>
+      </div>
+      <div id="plan"></div>
+      <dl class="stats" id="stats"></dl>
+    </div>
+
+    <div class="panel scope">
+      <div class="row">
+        <h2>Room impulse response</h2>
+        <div class="row" style="gap:8px">
+          <div class="seg" role="group" aria-label="Scale">
+            <button id="sc-db" data-scale="db" aria-pressed="true">dB</button>
+            <button id="sc-lin" data-scale="lin" aria-pressed="false">Linear</button>
+          </div>
+          <div class="seg" role="group" aria-label="Time range">
+            <button id="rg-full" data-range="full" aria-pressed="true">Full</button>
+            <button id="rg-early" data-range="early" aria-pressed="false">First 120 ms</button>
+          </div>
+        </div>
+      </div>
+      <canvas id="scope" aria-label="Room impulse response plot"></canvas>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--rev)"></i>RIR <code>room.rir</code></span>
+        <span><i class="sw" style="background:var(--early)"></i>Early target, 50 ms</span>
+        <span><i class="sw" style="background:var(--direct)"></i>Direct path <code>anechoic_rir</code></span>
+        <span id="lg-edc"><i class="sw" style="background:var(--edc)"></i>Energy decay curve (Schroeder)</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="listen" aria-label="Listening">
+    <div class="row"><h2>Listen</h2><span class="note">Click a spectrogram to seek. Switching clips while playing keeps the position, for A/B comparison.</span></div>
+    <div id="strips" class="listen"></div>
+    <p class="note" id="foot"></p>
+  </section>
+</div>
+
+<script type="application/json" id="data">__DATA__</script>
+<script>
+(() => {
+  const D = JSON.parse(document.getElementById("data").textContent);
+  const FS = D.fs;
+  const state = { room: 0, mic: 0, scale: "db", range: "full", playing: null };
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  const decodeI16 = o => {
+    const bin = atob(o.data), u8 = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    const i16 = new Int16Array(u8.buffer), out = new Float32Array(i16.length);
+    for (let i = 0; i < i16.length; i++) out[i] = i16[i] / 32767 * o.scale;
+    return out;
+  };
+  const decodeU8 = s => { const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };
+  const cache = new Map();
+  const memo = (k, f) => { if (!cache.has(k)) cache.set(k, f()); return cache.get(k); };
+
+  const CLIPS = [
+    { key: "reverberant", title: "Reverberant mixture", desc: "What the microphone records: <code>premix</code>.", color: "--rev" },
+    { key: "early", title: "Early target (50 ms)", desc: "Direct path + first 50 ms of reflections: <code>early_ms=50</code>.", color: "--early" },
+    { key: "direct", title: "Direct-path target", desc: "Anechoic, sample-aligned: <code>return_anechoic=True</code>.", color: "--direct" },
+  ];
+
+  /* ---------- room rail ---------- */
+  const rail = document.getElementById("rail");
+  D.rooms.forEach((r, i) => {
+    const b = document.createElement("button");
+    b.className = "room-btn"; b.id = "room-" + r.id;
+    b.setAttribute("aria-pressed", i === state.room);
+    b.innerHTML = `<span class="nm">${r.name}</span><span class="sub">${r.dim.join(" × ")} m · RT60 ${r.rt60_target.toFixed(2)} s</span>`;
+    b.onclick = () => { state.room = i; renderAll(); };
+    rail.appendChild(b);
+  });
+  document.querySelectorAll("[data-mic]").forEach(b => b.onclick = () => { state.mic = +b.dataset.mic; renderAll(); });
+  document.querySelectorAll("[data-scale]").forEach(b => b.onclick = () => { state.scale = b.dataset.scale; renderScope(); syncSeg(); });
+  document.querySelectorAll("[data-range]").forEach(b => b.onclick = () => { state.range = b.dataset.range; renderScope(); syncSeg(); });
+  function syncSeg() {
+    document.querySelectorAll("[data-mic]").forEach(b => b.setAttribute("aria-pressed", +b.dataset.mic === state.mic));
+    document.querySelectorAll("[data-scale]").forEach(b => b.setAttribute("aria-pressed", b.dataset.scale === state.scale));
+    document.querySelectorAll("[data-range]").forEach(b => b.setAttribute("aria-pressed", b.dataset.range === state.range));
+    rail.querySelectorAll(".room-btn").forEach((b, i) => b.setAttribute("aria-pressed", i === state.room));
+    document.getElementById("lg-edc").hidden = state.scale !== "db";
+  }
+
+  /* ---------- plan ---------- */
+  function renderPlan() {
+    const r = D.rooms[state.room], [L, W] = r.dim, pad = 0.9;
+    const vb = `${-pad} ${-pad * 0.6} ${L + 2 * pad} ${W + pad * 1.6}`;
+    const s = Math.max(L, W) / 10;  // stroke scale
+    let g = "";
+    for (let x = 1; x < L; x++) g += `<line x1="${x}" y1="0" x2="${x}" y2="${W}" stroke="var(--line)" stroke-width="${0.015 * s * 2}"/>`;
+    for (let y = 1; y < W; y++) g += `<line x1="0" y1="${y}" x2="${L}" y2="${y}" stroke="var(--line)" stroke-width="${0.015 * s * 2}"/>`;
+    const fy = y => W - y;  // y up
+    const src = r.src, m = r.mics[state.mic].pos, other = r.mics[1 - state.mic].pos;
+    const fsz = 0.32 * s * 1.4;
+    const mid = [(src[0] + m[0]) / 2, (src[1] + m[1]) / 2];
+    document.getElementById("plan").innerHTML = `
+      <svg viewBox="${vb}" role="img" aria-label="Top view of ${r.name}">
+        <rect x="0" y="0" width="${L}" height="${W}" fill="var(--bg)" stroke="var(--ink)" stroke-width="${0.05 * s}"/>
+        ${g}
+        <line x1="${src[0]}" y1="${fy(src[1])}" x2="${m[0]}" y2="${fy(m[1])}" stroke="var(--direct)" stroke-width="${0.04 * s}" stroke-dasharray="${0.12 * s} ${0.08 * s}"/>
+        <rect x="${other[0] - 0.12 * s}" y="${fy(other[1]) - 0.12 * s}" width="${0.24 * s}" height="${0.24 * s}" fill="var(--panel)" stroke="var(--muted)" stroke-width="${0.03 * s}"/>
+        <rect x="${m[0] - 0.15 * s}" y="${fy(m[1]) - 0.15 * s}" width="${0.3 * s}" height="${0.3 * s}" fill="var(--ink)"/>
+        <circle cx="${src[0]}" cy="${fy(src[1])}" r="${0.18 * s}" fill="var(--rev)"/>
+        <text x="${src[0]}" y="${fy(src[1]) - 0.3 * s}" font-size="${fsz}" text-anchor="middle" fill="var(--ink)" font-family="Instrument Sans, sans-serif">source</text>
+        <text x="${m[0]}" y="${fy(m[1]) + 0.55 * s}" font-size="${fsz}" text-anchor="middle" fill="var(--ink)" font-family="Instrument Sans, sans-serif">${r.mics[state.mic].label} mic</text>
+        <text x="${mid[0]}" y="${fy(mid[1]) - 0.15 * s}" font-size="${fsz * 0.9}" text-anchor="middle" fill="var(--direct)" font-family="IBM Plex Mono, monospace">${r.mics[state.mic].dist.toFixed(2)} m</text>
+        <text x="0" y="${W + 0.55 * s}" font-size="${fsz * 0.85}" fill="var(--muted)" font-family="IBM Plex Mono, monospace">${L} m × ${W} m, height ${r.dim[2]} m · grid 1 m</text>
+      </svg>`;
+  }
+
+  /* ---------- stats ---------- */
+  function renderStats() {
+    const r = D.rooms[state.room], m = r.mics[state.mic], p = m.params;
+    const f = (v, d, u) => v == null ? "–" : `${v.toFixed(d)}<small> ${u}</small>`;
+    const items = [
+      ["T20 (measured)", f(p.t20, 2, "s")],
+      ["RT60 target (Sabine)", f(r.rt60_target, 2, "s")],
+      ["EDT", f(p.edt, 2, "s")],
+      ["C50", f(p.c50, 1, "dB")],
+      ["DRR (±2.5 ms)", f(p.drr, 1, "dB")],
+      ["Direct sound at", f(m.t_direct * 1000, 1, "ms")],
+      ["Absorption", f(r.absorption, 3, "")],
+      ["Model", r.mode === "hybrid" ? `hybrid<small> ISM ${r.max_order} + RT</small>` : `ISM<small> order ${r.max_order}</small>`],
+    ];
+    document.getElementById("stats").innerHTML = items.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("");
+  }
+
+  /* ---------- scope ---------- */
+  function setupCanvas(cv) {
+    const dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+    if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+    const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+    return [ctx, w, h];
+  }
+  function renderScope() {
+    const r = D.rooms[state.room], m = r.mics[state.mic], key = state.room + ":" + state.mic;
+    const rir = memo(key + "rir", () => decodeI16(m.rir));
+    const early = memo(key + "early", () => decodeI16(m.early));
+    const ane = memo(key + "ane", () => decodeI16(m.anechoic));
+    const cv = document.getElementById("scope"), [ctx, W, H] = setupCanvas(cv);
+    const padL = 46, padR = 12, padT = 10, padB = 28, pw = W - padL - padR, ph = H - padT - padB;
+    const nTot = state.range === "full" ? rir.length : Math.min(rir.length, Math.round((m.t_direct + 0.12) * FS));
+    const t1 = nTot / FS;
+    const X = t => padL + t / t1 * pw;
+    const ink = css("--ink"), muted = css("--muted"), line = css("--line");
+    ctx.font = `11px ${css("--font-data")}`; ctx.fillStyle = muted; ctx.strokeStyle = line; ctx.lineWidth = 1;
+
+    // time ticks
+    const stepMs = [5, 10, 20, 50, 100, 200, 250, 500].find(s => t1 * 1000 / s <= 8) || 500;
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    for (let ms = 0; ms <= t1 * 1000 + 1e-6; ms += stepMs) {
+      const x = X(ms / 1000);
+      ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT + ph); ctx.stroke();
+      ctx.fillText(ms + (ms === 0 ? " ms" : ""), x, padT + ph + 6);
+    }
+    const peak = rir.reduce((a, v) => Math.max(a, Math.abs(v)), 0) || 1;
+    let Y;
+    if (state.scale === "db") {
+      const lo = -80; Y = db => padT + (Math.min(0, db) / lo) * ph;
+      ctx.textAlign = "right"; ctx.textBaseline = "middle";
+      for (let db = 0; db >= lo; db -= 20) { const y = Y(db); ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + pw, y); ctx.stroke(); ctx.fillText(db + " dB", padL - 6, y); }
+      // envelope per pixel column
+      const env = (sig, color, alpha) => {
+        ctx.fillStyle = color; ctx.globalAlpha = alpha;
+        const cols = Math.floor(pw);
+        for (let c = 0; c < cols; c++) {
+          const a = Math.floor(c / cols * nTot), b = Math.max(a + 1, Math.floor((c + 1) / cols * nTot));
+          let mx = 0; for (let i = a; i < b && i < sig.length; i++) mx = Math.max(mx, Math.abs(sig[i]));
+          if (mx <= 0) continue;
+          const db = 20 * Math.log10(mx / peak); if (db < lo) continue;
+          const y = Y(db); ctx.fillRect(padL + c, y, 1, padT + ph - y);
+        }
+        ctx.globalAlpha = 1;
+      };
+      env(rir, css("--rev"), 0.85);
+      env(early, css("--early"), 0.55);
+      env(ane, css("--direct"), 0.9);
+      // EDC
+      ctx.strokeStyle = css("--edc"); ctx.lineWidth = 1.6; ctx.beginPath();
+      m.edc.forEach((v, i) => { const t = i * m.edc_step; if (t > t1) return; const x = X(t), y = Y(Math.max(v, lo)); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+      ctx.stroke();
+      // -60 dB marker
+      ctx.setLineDash([4, 4]); ctx.strokeStyle = muted; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(padL, Y(-60)); ctx.lineTo(padL + pw, Y(-60)); ctx.stroke(); ctx.setLineDash([]);
+    } else {
+      Y = v => padT + ph / 2 - v / peak * (ph / 2) * 0.95;
+      ctx.textAlign = "right"; ctx.textBaseline = "middle";
+      [1, 0.5, 0, -0.5, -1].forEach(v => { const y = Y(v * peak); ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + pw, y); ctx.stroke(); ctx.fillText(v.toFixed(1), padL - 6, y); });
+      const trace = (sig, color, lw) => {
+        ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.beginPath();
+        const cols = Math.floor(pw);
+        if (nTot <= cols * 2) {
+          for (let i = 0; i < nTot; i++) { const v = i < sig.length ? sig[i] : 0, x = X(i / FS), y = Y(v); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+        } else {
+          for (let c = 0; c < cols; c++) {
+            const a = Math.floor(c / cols * nTot), b = Math.max(a + 1, Math.floor((c + 1) / cols * nTot));
+            let mn = 0, mx = 0; for (let i = a; i < b && i < sig.length; i++) { mn = Math.min(mn, sig[i]); mx = Math.max(mx, sig[i]); }
+            ctx.moveTo(padL + c + 0.5, Y(mx)); ctx.lineTo(padL + c + 0.5, Y(mn));
+          }
+        }
+        ctx.stroke();
+      };
+      trace(rir, css("--rev"), 1);
+      trace(early, css("--early"), 1);
+      trace(ane, css("--direct"), 1.8);
+    }
+    // direct arrival + 50 ms window
+    ctx.setLineDash([3, 3]); ctx.strokeStyle = css("--direct"); ctx.lineWidth = 1;
+    let x = X(m.t_direct); ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT + ph); ctx.stroke();
+    ctx.strokeStyle = css("--early"); x = X(m.t_direct + 0.05);
+    if (m.t_direct + 0.05 < t1) { ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT + ph); ctx.stroke(); }
+    ctx.setLineDash([]);
+    ctx.fillStyle = css("--early"); ctx.textAlign = "left"; ctx.textBaseline = "top"; ctx.font = `11px ${css("--font-data")}`;
+    if (m.t_direct + 0.05 < t1) ctx.fillText("+50 ms", x + 4, padT + 2);
+  }
+
+  /* ---------- listening strips ---------- */
+  const strips = document.getElementById("strips");
+  const audio = {}, specCv = {};
+  const playIcon = '<svg viewBox="0 0 16 16"><path d="M4 2.5v11l9-5.5z"/></svg>';
+  const pauseIcon = '<svg viewBox="0 0 16 16"><path d="M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z"/></svg>';
+  CLIPS.forEach(c => {
+    const el = document.createElement("div"); el.className = "strip";
+    el.innerHTML = `<div class="who"><button class="play" id="play-${c.key}" aria-label="Play ${c.title}" style="background:var(${c.color})">${playIcon}</button>
+      <div><div class="t">${c.title}</div><div class="d">${c.desc}</div></div></div>
+      <div class="spec"><canvas id="spec-${c.key}" aria-label="Spectrogram of ${c.title}"></canvas></div>`;
+    strips.appendChild(el);
+    const a = new Audio(); a.preload = "auto"; audio[c.key] = a;
+    a.addEventListener("ended", () => { if (state.playing === c.key) { state.playing = null; syncPlay(); } });
+    el.querySelector(".play").onclick = () => toggle(c.key);
+    const cv = el.querySelector("canvas"); specCv[c.key] = cv;
+    cv.onclick = ev => {
+      const rect = cv.getBoundingClientRect(), frac = (ev.clientX - rect.left) / rect.width;
+      const a = audio[c.key]; const dur = a.duration || 1;
+      if (state.playing && state.playing !== c.key) { audio[state.playing].pause(); }
+      a.currentTime = frac * dur; state.playing = c.key; a.play().catch(() => {}); syncPlay();
+    };
+  });
+  function loadAudio() {
+    const m = D.rooms[state.room].mics[state.mic];
+    const t = state.playing ? audio[state.playing].currentTime : 0, was = state.playing;
+    Object.values(audio).forEach(a => a.pause());
+    CLIPS.forEach(c => { audio[c.key].src = "data:audio/wav;base64," + m.audio[c.key]; });
+    if (was) { const a = audio[was]; a.addEventListener("loadedmetadata", () => { a.currentTime = Math.min(t, a.duration - 0.05); a.play().catch(() => {}); }, { once: true }); }
+  }
+  function toggle(key) {
+    const a = audio[key];
+    if (state.playing === key) { a.pause(); state.playing = null; }
+    else {
+      let t = 0;
+      if (state.playing) { t = audio[state.playing].currentTime; audio[state.playing].pause(); }
+      if (t > 0) a.currentTime = Math.min(t, (a.duration || t) - 0.02);
+      else if (a.ended || a.currentTime >= (a.duration || 1) - 0.05) a.currentTime = 0;
+      state.playing = key; a.play().catch(() => {});
+    }
+    syncPlay();
+  }
+  function syncPlay() {
+    CLIPS.forEach(c => {
+      const b = document.getElementById("play-" + c.key), on = state.playing === c.key;
+      b.innerHTML = on ? pauseIcon : playIcon; b.setAttribute("aria-label", (on ? "Pause " : "Play ") + c.title);
+    });
+  }
+
+  const mix = (a, b, t) => { const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)); const A = p(a), B = p(b); return A.map((v, i) => Math.round(v + (B[i] - v) * t)); };
+  const specImg = {};
+  function renderSpecs() {
+    const m = D.rooms[state.room].mics[state.mic];
+    const bg = css("--panel"), fg = css("--ink");
+    CLIPS.forEach(c => {
+      const cv = specCv[c.key], [ctx, W, H] = setupCanvas(cv), s = m.spec[c.key];
+      const u8 = memo(`${state.room}:${state.mic}:spec:${c.key}`, () => decodeU8(s.data));
+      const acc = css(c.color);
+      // colour ramp: panel -> clip colour -> ink
+      const lut = new Array(256);
+      for (let i = 0; i < 256; i++) { const t = i / 255; lut[i] = t < 0.6 ? mix(bg, acc, t / 0.6) : mix(acc, fg, (t - 0.6) / 0.4); }
+      const off = document.createElement("canvas"); off.width = s.cols; off.height = s.rows;
+      const octx = off.getContext("2d"), img = octx.createImageData(s.cols, s.rows);
+      for (let r = 0; r < s.rows; r++) for (let k = 0; k < s.cols; k++) {
+        const v = u8[r * s.cols + k], col = lut[v], o = (r * s.cols + k) * 4;
+        img.data[o] = col[0]; img.data[o + 1] = col[1]; img.data[o + 2] = col[2]; img.data[o + 3] = 255;
+      }
+      octx.putImageData(img, 0, 0);
+      specImg[c.key] = off;
+      ctx.imageSmoothingEnabled = true; ctx.drawImage(off, 0, 0, W, H);
+    });
+  }
+  function drawPlayheads() {
+    CLIPS.forEach(c => {
+      const cv = specCv[c.key], off = specImg[c.key]; if (!off) return;
+      const ctx = cv.getContext("2d"), W = cv.clientWidth, H = cv.clientHeight;
+      ctx.drawImage(off, 0, 0, W, H);
+      const a = audio[c.key];
+      if (a.duration && (state.playing === c.key || a.currentTime > 0)) {
+        const x = a.currentTime / a.duration * W;
+        ctx.fillStyle = css("--ink"); ctx.globalAlpha = state.playing === c.key ? 0.9 : 0.35;
+        ctx.fillRect(x - 1, 0, 2, H); ctx.globalAlpha = 1;
+      }
+    });
+    requestAnimationFrame(drawPlayheads);
+  }
+
+  function renderAll() {
+    syncSeg(); renderPlan(); renderStats(); renderScope(); renderSpecs(); loadAudio(); syncPlay();
+    const r = D.rooms[state.room];
+    document.getElementById("foot").innerHTML = `Speech: CMU ARCTIC <code>${D.speech}</code>, ${FS / 1000} kHz. The three clips share one gain per microphone, so their loudness differences are real. Spectrograms span 0–8 kHz, 80 dB range. The t0 tail impulse is off (<code>rt_tail_t0_impulse=False</code>).`;
+  }
+  renderAll();
+  requestAnimationFrame(drawPlayheads);
+  let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { renderScope(); renderSpecs(); }, 120); });
+  const rethemed = () => { renderScope(); renderSpecs(); };
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", rethemed);
+  new MutationObserver(rethemed).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>

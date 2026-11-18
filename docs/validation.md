@@ -87,3 +87,4 @@ See [cuda.md](cuda.md#benchmarks).
 | `bench/gpu_bench.py` | CPU vs CUDA vs CUDA + Gaussian tail |
 | `bench/profile_ref.py`, `bench/rt_bench.py` | profiling helpers |
 | `equiv/` | bitwise differential harness against the original build |
+| `examples/listening_page/build.py` | HTML page to view RIRs and listen to speech and targets (see [usage.md](usage.md#listening-page)) |
