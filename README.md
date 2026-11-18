@@ -89,18 +89,12 @@ there applies unchanged.
 
 ## Citing
 
-If you use this package, please cite both this repository (for the Rust/CUDA backends,
-aligned targets and GPU ray tracing) and the original pyroomacoustics paper. GitHub's
-"Cite this repository" button reads [CITATION.cff](CITATION.cff).
+This package has no paper of its own. If you use it, please cite the original
+pyroomacoustics paper, which is the reference for the simulation methods implemented
+here. GitHub's "Cite this repository" button gives the same entry (from
+[CITATION.cff](CITATION.cff)).
 
 ```bibtex
-@software{fast_pyroomacoustics,
-  author = {popcornell},
-  title  = {fast-pyroomacoustics: a Rust and CUDA accelerated drop-in replacement for pyroomacoustics},
-  year   = {2026},
-  url    = {https://github.com/popcornell/fast-pyroomacoustics}
-}
-
 @inproceedings{scheibler2018pyroomacoustics,
   author    = {Scheibler, Robin and Bezzam, Eric and Dokmani{\'c}, Ivan},
   title     = {Pyroomacoustics: A Python package for audio room simulations and array processing algorithms},
@@ -110,6 +104,10 @@ aligned targets and GPU ray tracing) and the original pyroomacoustics paper. Git
   doi       = {10.1109/ICASSP.2018.8461310}
 }
 ```
+
+If you want to point to this implementation as well (for the Rust/CUDA backends, the GPU
+ray tracing or the aligned targets), link the repository:
+<https://github.com/popcornell/fast-pyroomacoustics>.
 
 ## Credits and license
 

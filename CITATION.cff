@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: >-
-  If you use this software, please cite it as below, together with the original
-  pyroomacoustics paper (listed under references).
+  This package has no paper of its own. If you use it, please cite the original
+  pyroomacoustics paper below.
 type: software
 title: "fast-pyroomacoustics: a Rust and CUDA accelerated drop-in replacement for pyroomacoustics"
 authors:
@@ -17,23 +17,23 @@ keywords:
   - ray tracing
   - GPU
   - data simulation
-references:
-  - type: conference-paper
-    title: "Pyroomacoustics: A Python package for audio room simulations and array processing algorithms"
-    authors:
-      - family-names: Scheibler
-        given-names: Robin
-      - family-names: Bezzam
-        given-names: Eric
-      - family-names: Dokmanić
-        given-names: Ivan
-    collection-title: "Proceedings of the IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)"
-    conference:
-      name: ICASSP 2018
-      city: Calgary
-      country: CA
-    year: 2018
-    start: 351
-    end: 355
-    doi: 10.1109/ICASSP.2018.8461310
-    url: "https://arxiv.org/abs/1710.04196"
+preferred-citation:
+  type: conference-paper
+  title: "Pyroomacoustics: A Python package for audio room simulations and array processing algorithms"
+  authors:
+    - family-names: Scheibler
+      given-names: Robin
+    - family-names: Bezzam
+      given-names: Eric
+    - family-names: Dokmanić
+      given-names: Ivan
+  collection-title: "Proceedings of the IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)"
+  conference:
+    name: ICASSP 2018
+    city: Calgary
+    country: CA
+  year: 2018
+  start: 351
+  end: 355
+  doi: 10.1109/ICASSP.2018.8461310
+  url: "https://arxiv.org/abs/1710.04196"
