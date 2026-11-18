@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite it as below, together with the original
+  pyroomacoustics paper (listed under references).
+type: software
+title: "fast-pyroomacoustics: a Rust and CUDA accelerated drop-in replacement for pyroomacoustics"
+authors:
+  - alias: popcornell
+repository-code: "https://github.com/popcornell/fast-pyroomacoustics"
+license: MIT
+version: 0.10.2.dev7+rust
+date-released: 2026-11-18
+keywords:
+  - room acoustics
+  - room impulse response
+  - image source method
+  - ray tracing
+  - GPU
+  - data simulation
+references:
+  - type: conference-paper
+    title: "Pyroomacoustics: A Python package for audio room simulations and array processing algorithms"
+    authors:
+      - family-names: Scheibler
+        given-names: Robin
+      - family-names: Bezzam
+        given-names: Eric
+      - family-names: Dokmanić
+        given-names: Ivan
+    collection-title: "Proceedings of the IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)"
+    conference:
+      name: ICASSP 2018
+      city: Calgary
+      country: CA
+    year: 2018
+    start: 351
+    end: 355
+    doi: 10.1109/ICASSP.2018.8461310
+    url: "https://arxiv.org/abs/1710.04196"

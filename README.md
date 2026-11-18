@@ -87,15 +87,45 @@ For the pyroomacoustics API itself (rooms, materials, directivities, beamforming
 ...), see the [upstream documentation](https://pyroomacoustics.readthedocs.io/). Everything
 there applies unchanged.
 
+## Citing
+
+If you use this package, please cite both this repository (for the Rust/CUDA backends,
+aligned targets and GPU ray tracing) and the original pyroomacoustics paper. GitHub's
+"Cite this repository" button reads [CITATION.cff](CITATION.cff).
+
+```bibtex
+@software{fast_pyroomacoustics,
+  author = {popcornell},
+  title  = {fast-pyroomacoustics: a Rust and CUDA accelerated drop-in replacement for pyroomacoustics},
+  year   = {2026},
+  url    = {https://github.com/popcornell/fast-pyroomacoustics}
+}
+
+@inproceedings{scheibler2018pyroomacoustics,
+  author    = {Scheibler, Robin and Bezzam, Eric and Dokmani{\'c}, Ivan},
+  title     = {Pyroomacoustics: A Python package for audio room simulations and array processing algorithms},
+  booktitle = {Proc. IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
+  pages     = {351--355},
+  year      = {2018},
+  doi       = {10.1109/ICASSP.2018.8461310}
+}
+```
+
 ## Credits and license
 
 This is a reimplementation of [pyroomacoustics](https://github.com/LCAV/pyroomacoustics) by
 Robin Scheibler, Eric Bezzam, Ivan Dokmanić and the LCAV/EPFL contributors. The Python
-layer is theirs, with the changes described in the docs. If you use it in research, please
-cite their paper:
+layer is theirs, with the changes described in the docs.
 
-> R. Scheibler, E. Bezzam, I. Dokmanić, *Pyroomacoustics: A Python package for audio room
-> simulations and array processing algorithms*, Proc. IEEE ICASSP, Calgary, CA, 2018.
+What this repository adds on top of the original:
+
+* the Rust rewrite of `libroom`, with a bit-exact mode and a bounded thread pool;
+* fused fast-mode kernels for ISM synthesis and the ray-tracing tail;
+* the CUDA backend: GPU image source model, Triton ray tracing, batched tail synthesis,
+  GPU high-pass and convolutions;
+* aligned anechoic and early-reflection training targets, and the optional Gaussian tail
+  and `rt_tail_t0_impulse` switch;
+* the validation harnesses (`equiv/`, `bench/`).
 
 MIT license, see [LICENSE](LICENSE). The original README is kept in
 [docs/upstream-README.rst](docs/upstream-README.rst).
