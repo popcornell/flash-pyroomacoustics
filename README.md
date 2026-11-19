@@ -1,4 +1,4 @@
-# fast-pyroomacoustics
+# flash-pyroomacoustics
 
 A faster, drop-in replacement for [pyroomacoustics](https://github.com/LCAV/pyroomacoustics).
 The import name and API are unchanged (`import pyroomacoustics as pra`), and existing scripts
@@ -24,7 +24,7 @@ run as they are.
 From a release wheel:
 
 ```bash
-pip install fast_pyroomacoustics-*.whl        # add torch with CUDA for the GPU backend
+pip install flash_pyroomacoustics-*.whl        # add torch with CUDA for the GPU backend
 ```
 
 From source, which needs a Rust toolchain (`rustup`) and Python ≥ 3.9:
@@ -107,7 +107,7 @@ here. GitHub's "Cite this repository" button gives the same entry (from
 
 If you want to point to this implementation as well (for the Rust/CUDA backends, the GPU
 ray tracing or the aligned targets), link the repository:
-<https://github.com/popcornell/fast-pyroomacoustics>.
+<https://github.com/popcornell/flash-pyroomacoustics>.
 
 ## Credits and license
 

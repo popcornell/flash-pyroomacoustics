@@ -9,7 +9,7 @@ room.compute_rir()                            # or room.compute_rir(backend="cud
 pra.cuda.compute_rirs(rooms, anechoic=True)
 ```
 
-It needs `torch` with CUDA (`pip install "fast-pyroomacoustics[cuda]"`). Triton ships with
+It needs `torch` with CUDA (`pip install "flash-pyroomacoustics[cuda]"`). Triton ships with
 it. `pra.cuda.is_available()` tells whether the backend can be used.
 
 ## What runs on the GPU

@@ -3,10 +3,10 @@ message: >-
   This package has no paper of its own. If you use it, please cite the original
   pyroomacoustics paper below.
 type: software
-title: "fast-pyroomacoustics: a Rust and CUDA accelerated drop-in replacement for pyroomacoustics"
+title: "flash-pyroomacoustics: a Rust and CUDA accelerated drop-in replacement for pyroomacoustics"
 authors:
   - alias: popcornell
-repository-code: "https://github.com/popcornell/fast-pyroomacoustics"
+repository-code: "https://github.com/popcornell/flash-pyroomacoustics"
 license: MIT
 version: 0.10.2.dev7+rust
 date-released: 2026-11-18

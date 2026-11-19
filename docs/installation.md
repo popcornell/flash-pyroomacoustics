@@ -1,6 +1,6 @@
 # Installation
 
-The distribution is called `fast-pyroomacoustics`, but it installs the module
+The distribution is called `flash-pyroomacoustics`, but it installs the module
 `pyroomacoustics`. It replaces the original, so the two cannot be installed in the same
 environment:
 
@@ -11,7 +11,7 @@ pip uninstall pyroomacoustics
 ## From a wheel
 
 ```bash
-pip install fast_pyroomacoustics-<version>-cp311-cp311-manylinux_2_31_x86_64.whl
+pip install flash_pyroomacoustics-<version>-cp311-cp311-manylinux_2_31_x86_64.whl
 ```
 
 The wheel is about 126 MB, almost all of it the SOFA directivity files shipped with the
@@ -26,8 +26,8 @@ Requirements:
 * [maturin](https://www.maturin.rs) ≥ 1.7.
 
 ```bash
-git clone https://github.com/popcornell/fast-pyroomacoustics
-cd fast-pyroomacoustics
+git clone https://github.com/popcornell/flash-pyroomacoustics
+cd flash-pyroomacoustics
 pip install maturin
 
 # development install into the active environment
@@ -47,7 +47,7 @@ the Linux PyTorch wheels, and the ray-tracing kernel is JIT-compiled by it, so n
 is needed.
 
 ```bash
-pip install "fast-pyroomacoustics[cuda]"   # or: pip install torch
+pip install "flash-pyroomacoustics[cuda]"   # or: pip install torch
 python -c "import pyroomacoustics as pra; print(pra.cuda.is_available())"
 ```
 
